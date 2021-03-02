@@ -7,20 +7,39 @@ import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
+import java.lang.reflect.Method;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Arrays;
 import java.util.List;
 
-public class someTest {
+import org.apache.commons.lang3.StringUtils;
+
+public class homepageTest {
 
   private WebDriver driver;
 
+  public String generateTestName(Method testMethod) {
+      String testName = testMethod.getName();
+
+      String className = testMethod.getDeclaringClass().getName();
+      String splitTestName = StringUtils.join(
+          StringUtils.splitByCharacterTypeCamelCase(StringUtils.capitalize(testName)),
+          ' '
+      );
+
+      String readableTestName = StringUtils.join(new String[]{className, splitTestName}, ' ');
+
+      return readableTestName;
+  }
+
   @BeforeMethod
-  public void setupTestMethod() throws MalformedURLException {
+  public void setupTestMethod(Method testMethod) throws MalformedURLException {
     String sauceUserName = System.getenv("SAUCE_USERNAME");
     String sauceAccessKey = System.getenv("SAUCE_ACCESS_KEY");
     String sauceURL = "https://ondemand.saucelabs.com/wd/hub";
+
+    String testName = generateTestName(testMethod);
 
     /**
      * * Here we set the MutableCapabilities for "sauce:options", which is required for newer versions of Selenium
@@ -31,7 +50,7 @@ public class someTest {
     sauceOpts.setCapability("accessKey", sauceAccessKey);
     /** In order to use w3c you must set the seleniumVersion **/
     sauceOpts.setCapability("seleniumVersion", "3.141.59");
-    sauceOpts.setCapability("name", "4-best-practices");
+    sauceOpts.setCapability("name", testName);
     sauceOpts.setCapability("screenResolution", "1680x1050");
 
     /**
