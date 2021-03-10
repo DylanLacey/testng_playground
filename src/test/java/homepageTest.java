@@ -1,3 +1,4 @@
+import org.apache.commons.lang3.StringUtils;
 import org.openqa.selenium.*;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.remote.RemoteWebDriver;
@@ -13,11 +14,14 @@ import java.net.URL;
 import java.util.Arrays;
 import java.util.List;
 
-import org.apache.commons.lang3.StringUtils;
-
 public class homepageTest {
 
-  private WebDriver driver;
+  private ThreadLocal<WebDriver> threadDriverPool = new ThreadLocal<>();
+
+  private WebDriver driver(){
+    WebDriver threadDriver = threadDriverPool.get();
+    return threadDriver;
+  }
 
   public String generateTestName(Method testMethod) {
       String testName = testMethod.getName();
@@ -99,88 +103,107 @@ public class homepageTest {
     /** If you're accessing the EU data center, use the following endpoint:.
      * https://ondemand.eu-central-1.saucelabs.com/wd/hub
      * */
-    driver = new RemoteWebDriver(new URL(sauceURL), capabilities);
+
+    WebDriver driver = new RemoteWebDriver(new URL(sauceURL), capabilities);
+    threadDriverPool.set(driver);
+    String driverId = ((RemoteWebDriver)driver()).getSessionId().toString();
+    System.out.println("Setup " + driverId +" " +Thread.currentThread().getName());
   }
 
   @Test
   public void shouldVisitCashdeck() {
     /** Don't forget to enter in your application's URL in place of 'https://www.saucedemo.com'. */
-    driver.navigate().to("https://www.cashdeck.com.au");
-    Assert.assertEquals(driver.getTitle(), "CashDeck");
+      String driverId = ((RemoteWebDriver)driver()).getSessionId().toString();
+    System.out.println("shouldVisitCashdeck " + driverId +" " +Thread.currentThread().getName());
+    driver().navigate().to("https://www.cashdeck.com.au");
+    Assert.assertEquals(driver().getTitle(), "CashDeck");
 
   }
 
     @Test
     public void shouldHaveAPersonalPageHero() {
         /** Don't forget to enter in your application's URL in place of 'https://www.saucedemo.com'. */
-        driver.navigate().to("https://www.cashdeck.com.au");
+        String driverId = ((RemoteWebDriver)driver()).getSessionId().toString();
+        System.out.println("shouldHaveAPersonalPageHero Thread:  " + driverId +" " +Thread.currentThread().getName());
+        driver().navigate().to("https://www.cashdeck.com.au");
 
-        WebElement personalButton = driver.findElement(By.className("personal"));
+        WebElement personalButton = driver().findElement(By.className("personal"));
         personalButton.click();
 
-        Assert.assertEquals(driver.getTitle(), "CashDeck");
-        Assert.assertEquals(driver.findElements(By.cssSelector(".hero.partners.index")).size(), 1);
+        Assert.assertEquals(driver().getTitle(), "CashDeck");
+        Assert.assertEquals(driver().findElements(By.cssSelector(".hero.partners.index")).size(), 1);
     }
 
     @Test
     public void shouldHaveABrokerHeroPage() {
-        /** Don't forget to enter in your application's URL in place of 'https://www.saucedemo.com'. */
-        driver.navigate().to("https://www.cashdeck.com.au");
+        String driverId = ((RemoteWebDriver)driver()).getSessionId().toString();
+        System.out.println("shouldHaveABrokerHeroPage Thread: " + driverId +" " +Thread.currentThread().getName());
 
-        WebElement personalButton = driver.findElement(By.className("brokers"));
+        /** Don't forget to enter in your application's URL in place of 'https://www.saucedemo.com'. */
+        driver().navigate().to("https://www.cashdeck.com.au");
+
+        WebElement personalButton = driver().findElement(By.className("brokers"));
         personalButton.click();
 
-        Assert.assertEquals(driver.getTitle(), "CashDeck");
-        Assert.assertEquals(driver.findElements(By.cssSelector(".hero.brokers.index")).size(), 1);
+        Assert.assertEquals(driver().getTitle(), "CashDeck");
+        Assert.assertEquals(driver().findElements(By.cssSelector(".hero.brokers.index")).size(), 1);
     }
 
     @Test
     public void shouldHaveAnAdviserHeroPage() {
+        String driverId = ((RemoteWebDriver)driver()).getSessionId().toString();
+        System.out.println("shouldHaveAnAdviserHeroPage Thread:  " + driverId +" " +Thread.currentThread().getName());
         /** Don't forget to enter in your application's URL in place of 'https://www.saucedemo.com'. */
-        driver.navigate().to("https://www.cashdeck.com.au");
+        driver().navigate().to("https://www.cashdeck.com.au");
 
-        WebElement personalButton = driver.findElement(By.className("professional"));
+        WebElement personalButton = driver().findElement(By.className("professional"));
         personalButton.click();
 
-        Assert.assertEquals(driver.getTitle(), "CashDeck");
-        Assert.assertEquals(driver.findElements(By.cssSelector(".hero.partners.index")).size(), 1);
+        Assert.assertEquals(driver().getTitle(), "CashDeck");
+        Assert.assertEquals(driver().findElements(By.cssSelector(".hero.partners.index")).size(), 1);
     }
 
     @Test
     public void shouldHaveACustomHeroPage() {
+        String driverId = ((RemoteWebDriver)driver()).getSessionId().toString();
+        System.out.println("shouldHaveACustomHeroPage Thread:  " + driverId +" " +Thread.currentThread().getName());
         /** Don't forget to enter in your application's URL in place of 'https://www.saucedemo.com'. */
-        driver.navigate().to("https://www.cashdeck.com.au");
+        driver().navigate().to("https://www.cashdeck.com.au");
 
-        WebElement personalButton = driver.findElement(By.className("custom"));
+        WebElement personalButton = driver().findElement(By.className("custom"));
         personalButton.click();
 
-        Assert.assertEquals(driver.getTitle(), "CashDeck");
-        Assert.assertEquals(driver.findElements(By.cssSelector(".hero.partners.index")).size(), 1);
+        Assert.assertEquals(driver().getTitle(), "CashDeck");
+        Assert.assertEquals(driver().findElements(By.cssSelector(".hero.partners.index")).size(), 1);
     }
 
     @Test
     public void customPageShouldHaveSecurityLinks() {
+        String driverId = ((RemoteWebDriver)driver()).getSessionId().toString();
+        System.out.println("customPageShouldHaveSecurityLinks Thread:  " + driverId +" " +Thread.currentThread().getName());
         /** Don't forget to enter in your application's URL in place of 'https://www.saucedemo.com'. */
-        driver.navigate().to("https://www.cashdeck.com.au");
+        driver().navigate().to("https://www.cashdeck.com.au");
 
-        WebElement personalButton = driver.findElement(By.className("custom"));
+        WebElement personalButton = driver().findElement(By.className("custom"));
         personalButton.click();
 
-        Assert.assertEquals(driver.getTitle(), "CashDeck");
-        Assert.assertEquals(driver.findElements(By.cssSelector(".hero.partners.index")).size(), 1);
+        Assert.assertEquals(driver().getTitle(), "CashDeck");
+        Assert.assertEquals(driver().findElements(By.cssSelector(".hero.partners.index")).size(), 1);
 
-        WebElement sec_button = driver.findElement(By.linkText("Security"));
+        WebElement sec_button = driver().findElement(By.linkText("Security"));
         sec_button.click();
 
-        Assert.assertEquals(driver.getTitle(), "CashDeck");
-        Assert.assertEquals(driver.findElements(By.cssSelector(".hero.partner.security")).size(), 1);
+        Assert.assertEquals(driver().getTitle(), "CashDeck");
+        Assert.assertEquals(driver().findElements(By.cssSelector(".hero.partner.security")).size(), 1);
     }
 
 
 
   @AfterMethod
   public void cleanUpAfterTestMethod(ITestResult result) {
-    ((JavascriptExecutor)driver).executeScript("sauce:job-result=" + (result.isSuccess() ? "passed" : "failed"));
-    driver.quit();
+      String driverId = ((RemoteWebDriver)driver()).getSessionId().toString();
+    System.out.println("Shutdown Thread:  " + driverId +" " +Thread.currentThread().getName());
+    ((JavascriptExecutor)driver()).executeScript("sauce:job-result=" + (result.isSuccess() ? "passed" : "failed"));
+    driver().quit();
   }
 }
